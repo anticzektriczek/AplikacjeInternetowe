@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>To-Do</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button class="wrapper">
+      <h2>To-Do</h2>
+      <p></p>
+      <ul class="tasks">
+        <li>Loading tasks...</li>
+      </ul>
+      <form class="add-tasks">
+        <input type="text" name="task" placeholder="Nazwa" required />
+        <input type="submit" value="Dodaj" />
+      </form>
+
+    <script>
+        const addTasks = document.querySelector(".add-tasks");
+        const list = document.querySelector(".tasks");
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+        function addTask(event) {
+        event.preventDefault();
+        const text = this.querySelector("[name=task]").value; 
+
+        const newTask = {
+          text,
+          done: false,
+        };
+
+        tasks.push(newTask);
+        populateList(tasks, list);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        this.reset();
+      }
+
+      function populateList(tasks = [], list) {
+        list.innerHTML = tasks
+          .map((task, i) => {
+            return `
+          <p>
+            <input type="checkbox" data-index=${i} id="task${i}"
+            ${task.done ? "checked" : ""}/>
+            <label for="task${i}">${task.text}</label>
+            <button id="delete">Usuń</button>
+          </p>
+          `;
+          })
+          .join(""); 
+      }
+
+      function toggleDone(e) {
+        if (!e.target.matches("input")) return;
+        const element = e.target;
+        const index = element.dataset.index;
+        tasks[index].done = !tasks[index].done;
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        populateList(tasks, list);
+      }
+
+      addTasks.addEventListener("submit", addTask);
+      list.addEventListener("click", toggleDone);
+      populateList(tasks, list);
+
+      const createBtnEl = document.getElementById('createElement');
+      const deleteBtnEl = document.getElementById('deleteElement');
+
+
+    function createElementWithText(tagName, textContent, className) {
+        const newElement = document.createElement(tagName);
+        newElement.textContent = textContent;
+        newElement.setAttribute('class', className);
+        return newElement;
+    }
+    </script>
+  </body>
+</html>
