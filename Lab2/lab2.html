@@ -5,75 +5,152 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <button class="wrapper">
+    <div class="wrapper">
       <h2>To-Do</h2>
-      <p></p>
-      <ul class="tasks">
-        <li>Loading tasks...</li>
+      <input type="text" id="myInput" onkeyup="szukaj()" placeholder="szukaj">
+      <ul class="tasks" id="myUL">
       </ul>
       <form class="add-tasks">
-        <input type="text" name="task" placeholder="Nazwa" required />
+        <input type="text" name="task" placeholder="Nazwa" required minlength="3" maxlength="255"/>
+        <input type="date" name="date" id="taskDate"/>
         <input type="submit" value="Dodaj" />
       </form>
+    </div>
+    <style>
+      .wrapper{
+        border: solid black 10px;
+        text-align: center;
+        margin: 20px;
+        padding: 20px;
 
-    <script>
-        const addTasks = document.querySelector(".add-tasks");
-        const list = document.querySelector(".tasks");
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
+      }
+      ul{
+        list-style-type: none;
+      }
+    </style>
+      <script>
+        const addTasks = document.querySelector('.add-tasks');
+        const list = document.querySelector('.tasks');
+        const taskDateInput = document.getElementById('taskDate');
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let editingIndex = null;
+        const today = new Date().toISOString().split('T')[0];
+        taskDateInput.min = today;
         function addTask(event) {
         event.preventDefault();
-        const text = this.querySelector("[name=task]").value; 
-
-        const newTask = {
-          text,
-          done: false,
-        };
-
+        const text = this.querySelector('[name=task]').value;
+        const date = this.querySelector('[name=date]').value;
+        const newTask = { text, date, done: false };
         tasks.push(newTask);
-        populateList(tasks, list);
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        saveAndRender();
         this.reset();
-      }
-
-      function populateList(tasks = [], list) {
-        list.innerHTML = tasks
-          .map((task, i) => {
-            return `
-          <p>
-            <input type="checkbox" data-index=${i} id="task${i}"
-            ${task.done ? "checked" : ""}/>
-            <label for="task${i}">${task.text}</label>
-            <button id="delete">Usuń</button>
-          </p>
-          `;
-          })
-          .join(""); 
-      }
-
-      function toggleDone(e) {
-        if (!e.target.matches("input")) return;
-        const element = e.target;
-        const index = element.dataset.index;
+        }
+        
+        
+        function populateList(tasks = [], list) {
+        list.innerHTML = tasks.map((task, i) => {
+        return `
+        <li>
+        <input type="checkbox" data-index="${i}" id="task${i}" ${task.done ? 'checked' : ''} />
+        <span for="task${i}" id="${i}" onclick="editStart(this,${i})">${task.text} ${task.date}</span>
+        <button onclick="deleteTask(${i})">Usuń</button>
+        </li>`;
+        })
+        .join('');
+        }
+        
+        
+        function toggleDone(e) {
+        if (!e.target.matches('input[type="checkbox"]')) return;
+        const index = e.target.dataset.index;
         tasks[index].done = !tasks[index].done;
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        saveAndRender();
+        }
+        
+        function editStart(e, i) {
+          const element = document.getElementById(i);
+          const oldText = tasks[i].text;        
+          const oldDate = tasks[i].date; 
+          element.innerHTML = `<input type="text" id="editText${i}" value="${oldText}" /> <input type="date" id="editDate${i}" value="${oldDate}" />`;
+          const inputText = document.getElementById(`editText${i}`);
+          const inputDate = document.getElementById(`editDate${i}`);
+          inputDate.focus();
+          function saveBoth() {
+            tasks[i].text = inputText.value;
+            tasks[i].date = inputDate.value;
+            editingIndex = null;
+            saveAndRender();
+          }
+          inputText.addEventListener('blur', saveBoth);
+          
+        }
+        
+        function deleteTask(i) {
+        tasks.splice(i, 1);
+        saveAndRender();
+        }
+        
+        
+        function saveAndRender() {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         populateList(tasks, list);
-      }
+        }
+        
+        function szukaj() {
+  const input = document.getElementById('myInput').value.toUpperCase();
+  const ul = document.getElementById("myUL");
+  const li = ul.getElementsByTagName('li');
 
-      addTasks.addEventListener("submit", addTask);
-      list.addEventListener("click", toggleDone);
-      populateList(tasks, list);
-
-      const createBtnEl = document.getElementById('createElement');
-      const deleteBtnEl = document.getElementById('deleteElement');
-
-
-    function createElementWithText(tagName, textContent, className) {
-        const newElement = document.createElement(tagName);
-        newElement.textContent = textContent;
-        newElement.setAttribute('class', className);
-        return newElement;
+  if (input.length < 2) {
+    for (let i = 0; i < li.length; i++) {
+      const span = li[i].getElementsByTagName("span")[0];
+      span.innerHTML = tasks[i].text + " " + tasks[i].date; 
+      li[i].style.display = ""; 
     }
-    </script>
+    return;
+  }
+  for (let i = 0; i < li.length; i++) {
+    const span = li[i].getElementsByTagName("span")[0];
+    const txt = tasks[i].text + " " + tasks[i].date; 
+    if (txt.toUpperCase().includes(input)) {
+      const start = txt.toUpperCase().indexOf(input);
+      const end = start + input.length;
+      span.innerHTML =
+        txt.substring(0, start) +
+        `<mark>` + txt.substring(start, end) + `</mark>` +
+        txt.substring(end);
+      li[i].style.display = "";
+    } else {
+      span.innerHTML = txt; 
+      li[i].style.display = "none";
+    }
+  }
+}
+
+
+        function szukaj1() {
+          var input, filter, ul, li, a, i, txtValue;
+          input = document.getElementById('myInput');
+          filter = input.value.toUpperCase();
+          ul = document.getElementById("myUL");
+          li = ul.getElementsByTagName('li');
+          
+          for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("span")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+              li[i].style.backgroundColor = "yellow";
+            } else {
+              li[i].style.display = "none";
+            }
+          }
+        }
+        
+        
+        addTasks.addEventListener('submit', addTask);
+        list.addEventListener('click', toggleDone);
+        populateList(tasks, list);
+        </script>
   </body>
 </html>
