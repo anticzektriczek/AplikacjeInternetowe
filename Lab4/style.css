@@ -1,0 +1,128 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* TŁO STRONY */
+body {
+    background: linear-gradient(135deg, #78a8ff, #b7e0ff);
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* WYSZUKIWARKA */
+#weather-search-params {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+#locationInput {
+    padding: 12px 18px;
+    width: 260px;
+    font-size: 16px;
+    border-radius: 14px;
+    border: 1px solid #d0d0d0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    transition: 0.2s;
+}
+
+#locationInput:focus {
+    border-color: #006eff;
+    box-shadow: 0 0 8px rgba(0, 111, 255, 0.35);
+}
+
+/* PRZYCISK */
+#checkButton {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 14px;
+    background: #006eff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s;
+    letter-spacing: 1px;
+}
+
+#checkButton:hover {
+    background: #0050c0;
+    transform: translateY(-2px);
+}
+
+#checkButton:active {
+    transform: translateY(0);
+}
+
+/* LISTA KART */
+#weather-results-container {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding-bottom: 40px;
+}
+
+/* POJEDYNCZA KARTA */
+.weather-block {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 22px;
+    border-radius: 22px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: 0.25s;
+    animation: fadeIn 0.5s ease;
+}
+
+.weather-block:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+/* ELEMENTY W KARCIĘ */
+.weather-date {
+    color: #444;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.weather-temperature {
+    font-size: 38px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #000;
+}
+
+.weather-feel {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.weather-description {
+    font-size: 17px;
+    margin-top: 6px;
+    text-transform: capitalize;
+}
+
+/* ANIMACJA */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ŁADOWANIE */
+.loading {
+    font-size: 20px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
